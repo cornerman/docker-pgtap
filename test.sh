@@ -46,7 +46,7 @@ echo "Waiting for postgres to be ready ($HOST:$PORT)"
 while ! timeout 60 bash -c "cat < /dev/null > /dev/tcp/$HOST/$PORT" >/dev/null 2>&1; do sleep 1; done
 
 echo "Install pgtap into db '$DATABASE'"
-PGPASSWORD=$PASSWORD psql -h $HOST -p $PORT -d $DATABASE -U $USER -f /usr/share/postgresql/9.5/extension/pgtap--0.95.0.sql 2>&1
+PGPASSWORD=$PASSWORD psql -h $HOST -p $PORT -d $DATABASE -U $USER -f /usr/share/postgresql/9.6/extension/pgtap--0.99.0.sql 2>&1
 rc=$?
 
 if [[ $rc != 0 ]] ; then
