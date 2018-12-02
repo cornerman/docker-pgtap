@@ -3,7 +3,7 @@ services: docker
 
 script:
     - docker pull cornerman/docker-pgtap:latest
-    - docker build . --cache-from cornerman/docker-pgtap:latest -t cornerman/docker-pgtap:latest -t cornerman/docker-pgtap:"$TRAVIS_COMMIT"
+    - docker build . --cache-from cornerman/docker-pgtap:latest --tag cornerman/docker-pgtap:latest --tag cornerman/docker-pgtap:"$TRAVIS_COMMIT"
     - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
     - docker push cornerman/docker-pgtap:"$TRAVIS_COMMIT"
     - docker push cornerman/docker-pgtap:latest

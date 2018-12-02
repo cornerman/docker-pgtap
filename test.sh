@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
+set -o pipefail
 
 DATABASE=
 HOST=
@@ -46,7 +48,14 @@ echo "Waiting for postgres to be ready ($HOST:$PORT)"
 while ! timeout 60 bash -c "cat < /dev/null > /dev/tcp/$HOST/$PORT" >/dev/null 2>&1; do sleep 1; done
 
 echo "Install pgtap into db '$DATABASE'"
-PGPASSWORD=$PASSWORD psql -h $HOST -p $PORT -d $DATABASE -U $USER -f /usr/share/postgresql/9.6/extension/pgtap--0.99.0.sql 2>&1
+function psqlbatch() {
+    # Worth reading: https://petereisentraut.blogspot.com/2010/03/running-sql-scripts-with-psql.html
+    #  --set ON_ERROR_STOP=1 --single-transaction
+    # since pgtap prints lots of errors on installation, we set min-messages to fatal
+    # https://www.postgresql.org/docs/current/runtime-config-logging.html#GUC-CLIENT-MIN-MESSAGES
+    PGOPTIONS='--client-min-messages=fatal' psql --no-psqlrc --quiet --pset pager=off "$@"
+}
+PGPASSWORD=$PASSWORD psqlbatch -h $HOST -p $PORT -d $DATABASE -U $USER -f /usr/share/postgresql/9.6/extension/pgtap--0.99.0.sql 2>&1
 rc=$?
 
 if [[ $rc != 0 ]] ; then
